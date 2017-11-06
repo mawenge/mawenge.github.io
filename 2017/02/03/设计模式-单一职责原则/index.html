@@ -1,0 +1,647 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式----单一职责原则">
+<meta property="og:url" content="http://yoursite.com/2017/02/03/设计模式-单一职责原则/index.html">
+<meta property="og:site_name" content="MaWenge&#39;s Blog">
+<meta property="og:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img/1.png">
+<meta property="og:image" content="http://yoursite.com/img/2.png">
+<meta property="og:updated_time" content="2017-11-06T01:32:29.034Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设计模式----单一职责原则">
+<meta name="twitter:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta name="twitter:image" content="http://yoursite.com/img/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/"/>
+
+
+
+
+
+  <title> 设计模式----单一职责原则 | MaWenge's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">MaWenge's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Turbo">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/portrait.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="MaWenge's Blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="MaWenge's Blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                设计模式----单一职责原则
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-03T21:51:54+08:00">
+                2017-02-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/03/设计模式-单一职责原则/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/03/设计模式-单一职责原则/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h2><p>面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础</p>
+<ol>
+<li><strong>单一职责原则</strong></li>
+<li><strong>里氏替换原则</strong></li>
+<li><strong>依赖倒置原则</strong></li>
+<li><strong>接口隔离原则</strong></li>
+<li><strong>迪米特法则</strong></li>
+<li><strong>开闭原则</strong></li>
+</ol>
+<p>如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。如果发现有不准确的地方，欢迎留言交流，共同进步。</p>
+<h2 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h2><p>单一职责的英文名称是<strong>Single Responsibility Principle</strong>，简称SRP。SRP原话解释如下：</p>
+<blockquote>
+<p>There should never be more than one reason for a class to change<br>应该有且只有一个原因引起类的变更</p>
+</blockquote>
+<p>其实单一职责这句话本身就已经说得很清楚了，就是一个类只负责一件事，不负责其他的事情。而能够引起这个类变化的原因也是只有这个类负责的事情。</p>
+<p>这里举一个例子，也是书上的例子：<br>打电话需要四个过程，拨号、通话、回应、挂机，现在写一个接口如下<br><img src="/img/1.png" alt=""></p>
+<p>这三个方法都是电话的功能，把他们全都放在IPhone的接口中也是非常合理的。而且它就负责一件事，电话的事情，但只有一个原因引起变化吗？好像不是<br>IPhone这个接口其实有两个职责：一是协议管理，二是数据传送。dial() hangup()实现的是协议管理，分别负责拨号接通和挂机；chat()实现的是数据的传送，把模拟信号转换成数字信号等等。协议的变化和数据传送的变化都能够引起接口或实现类的变化。那么协议控制和数据传送之间相互依赖吗？电话拨号，我们只要接通就成，甭管是电信还是网通的协议；电话接通后我们也不关心传递的是什么数据。通过这样的分析我们发现类图上的IPhone接口包含了两个职责，而且这两个职责的变化不会相互影响，那就考虑拆分成两个接口<br><img src="/img/2.png" alt=""></p>
+<p>那么这么做到底能有什么好处呢，请看下面：</p>
+<ol>
+<li><p>我们使用的是面向接口的编程，所以暴露给使用者的是两个接口类型IConnectionManager和IDataTransfer。使用者只能调用接口中声明的方法。面向接口编程实现了方法的隔离，使得使用者只需要使用方法即可，不需要知道具体实现，并且只能使用该接口的方法。所以在业务层面与协议有关的就是IConnectionManager，而与数据传输相关的就是IDataTransfer，到时候如果修改了接口里面的内容，业务调用层需要修改的内容范围也会减小（例如如果修改了数据传输IDataTransfer，那么业务层只需要修改IDataTransfer有关的内容，IConnectionManager相关的内容则完全不用修改，找起来也方便一点，如果没有拆分成两个接口，那么就要找到所有IPhone接口使用的地方一一检查）</p>
+</li>
+<li><p>这里的实现类Phone仍然实现了打电话有关的所有功能，只不过对于不同的使用情况通过接口类型暴露不同的方法给调用者。那么有人肯定要问为什么不定义两个实现类分别实现IConnectionManager和IDataManager，然后分别把两个实现类的对象传递给接口对象。这里IConnectionManager和IDataManager的实现方法如果要共享数据的话，那么让Phone类同时实现IConnectionManager和IDataManager接口，这样就可以很方便的在类内部维护共享数据以及状态，而通过接口对外暴露功能方法，类的结构也很清晰。还有一种就是Phone类组合IConnectionManager和IDataManager的实现类，但是组合是一种强耦合关系，而且还增加了类的复杂性，多了两个类，还不如直接让Phone类实现IConnectionManager和IDataManager接口。</p>
+</li>
+</ol>
+<p>单一职责原则提出了一个编写程序的标准，用“职责”或“变化原因”来衡量接口或类设计得是否优良，但是“职责”和“变化原因”都是不可度量的，因项目而异，因环境而异。</p>
+<p>上面的例子从功能上来说，定义一个IPhone接口来说也是没有错的，实现了电话的功能，而且设计还很简单，仅仅定义一个接口和一个实现类。但是确实是有两个可以变化的原因放到了一个接口里面，这就为以后的变化带来了风险。如果以后模拟电话升级到数字电话，我们提供的接口IPhone是不是要修改了？接口修改对其他的Invoker类是不是有很大的影响？</p>
+<p>单一职责适用于接口、类，同时也适用于方法。一个方法尽量做一件事。我相信大多数人编程的时候突然发现接下来要写的一段代码以前好像写过，然后回去把那段代码又提取出来变成一个单独的方法。这就时前面设计方法的时候做了太多事情，粒度太大了，相信大多数人多方法的单一职责还是比较容易理解的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/07/android-ptp-编程（1）/" rel="next" title="android ptp 编程（1）">
+                <i class="fa fa-chevron-left"></i> android ptp 编程（1）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/29/新建文章标题/" rel="prev" title="新建文章标题">
+                新建文章标题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTU5Ni84MTYw"></div>
+    
+  </div>
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/portrait.jpg"
+               alt="Turbo" />
+          <p class="site-author-name" itemprop="name">Turbo</p>
+          <p class="site-description motion-element" itemprop="description">记录我的想写下的东西</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计原则"><span class="nav-number">1.</span> <span class="nav-text">设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单一职责原则"><span class="nav-number">2.</span> <span class="nav-text">单一职责原则</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Turbo</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

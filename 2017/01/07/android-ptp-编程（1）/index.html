@@ -1,0 +1,645 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近公司用到一个项目，android手机通过OTG与单反相机实现连接，实现相机中有新增图片的时候自动保存到手机当中，然后手机自动上传到自己的服务器上。后面一步是比较常规的操作，一般都可以实现，主要是前一步。这个系列将介绍我如何一步步实现这些功能以及踩到的一些坑(文中很多链接需要自备梯子) 以下介绍相关概念 PTP协议(picture transfer protocol) Picture Trans">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android ptp 编程（1）">
+<meta property="og:url" content="http://yoursite.com/2017/01/07/android-ptp-编程（1）/index.html">
+<meta property="og:site_name" content="MaWenge&#39;s Blog">
+<meta property="og:description" content="最近公司用到一个项目，android手机通过OTG与单反相机实现连接，实现相机中有新增图片的时候自动保存到手机当中，然后手机自动上传到自己的服务器上。后面一步是比较常规的操作，一般都可以实现，主要是前一步。这个系列将介绍我如何一步步实现这些功能以及踩到的一些坑(文中很多链接需要自备梯子) 以下介绍相关概念 PTP协议(picture transfer protocol) Picture Trans">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img/android_usb.png">
+<meta property="og:image" content="http://yoursite.com/img/android_mtp.png">
+<meta property="og:updated_time" content="2017-11-06T01:32:29.016Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android ptp 编程（1）">
+<meta name="twitter:description" content="最近公司用到一个项目，android手机通过OTG与单反相机实现连接，实现相机中有新增图片的时候自动保存到手机当中，然后手机自动上传到自己的服务器上。后面一步是比较常规的操作，一般都可以实现，主要是前一步。这个系列将介绍我如何一步步实现这些功能以及踩到的一些坑(文中很多链接需要自备梯子) 以下介绍相关概念 PTP协议(picture transfer protocol) Picture Trans">
+<meta name="twitter:image" content="http://yoursite.com/img/android_usb.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/07/android-ptp-编程（1）/"/>
+
+
+
+
+
+  <title> android ptp 编程（1） | MaWenge's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">MaWenge's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/07/android-ptp-编程（1）/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Turbo">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/portrait.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="MaWenge's Blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="MaWenge's Blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                android ptp 编程（1）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-07T17:01:06+08:00">
+                2017-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/07/android-ptp-编程（1）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/07/android-ptp-编程（1）/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近公司用到一个项目，android手机通过<a href="http://baike.baidu.com/link?url=j92Z7WzjziSGlCVRjEIbmKyBzXzjZGf90Kd7J6RWWWL4YnFToL-KhVejy0fr2KeuiM_u_6wMdTXgSh7U-Xb80_" target="_blank" rel="external">OTG</a>与单反相机实现连接，实现相机中有新增图片的时候自动保存到手机当中，然后手机自动上传到自己的服务器上。后面一步是比较常规的操作，一般都可以实现，主要是前一步。这个系列将介绍我如何一步步实现这些功能以及踩到的一些坑(文中很多链接需要自备梯子)</p>
+<p>以下介绍相关概念</p>
+<h2 id="PTP协议-picture-transfer-protocol"><a href="#PTP协议-picture-transfer-protocol" class="headerlink" title="PTP协议(picture transfer protocol)"></a>PTP协议(picture transfer protocol)</h2><blockquote>
+<p>Picture Transfer Protocol (PTP) is a protocol developed by the International Imaging Industry Association to allow the transfer of images from digital cameras to computers and other peripheral devices without the need of additional device drivers. The protocol has been standardised as ISO 15740.</p>
+<p>It is further standardized for USB by the USB Implementers Forum as the still image capture device class. USB is the default network transport media for PTP devices. USB PTP is a common alternative to the USB mass-storage device class (USB MSC), as a digital camera connection protocol. Some cameras support both modes.</p>
+</blockquote>
+<p>这是维基百科对ptp的描述。可见主要是数码相机与外部设备通信的一种协议。</p>
+<p>PTP是最早由柯达与微软协商制定的一种标准，符合这种标准的图像设备在接入Windows XP系统之后可以更好地被系统和应用程序所共享，尤其在网络传输方面，系统可以直接访问这些设备用于建立网络相册时图片的上传、网上聊天时图片的传送等。</p>
+<h2 id="MTP媒体传输协议（Media-Transfer-Protocol，MTP）"><a href="#MTP媒体传输协议（Media-Transfer-Protocol，MTP）" class="headerlink" title="MTP媒体传输协议（Media Transfer Protocol，MTP）"></a>MTP媒体传输协议（Media Transfer Protocol，MTP）</h2><blockquote>
+<p>媒体传输协议（Media Transfer Protocol，MTP）是一个基于图片传输协议（Picture Transfer Protocol，PTP）的自定义扩展协议。该协议允许用户在移动设备上线性访问媒体文件。PTP只是被设计用于从数码相机下载照片，而MTP可以支持数字音频播放器上的音乐文件和便携式媒体播放器上的媒体文件，以及个人数字助理的个人信息的传输。MTP是WMDRM10-PD的一个关键部分，而WMDRM10-PD是Windows Media的一项数字版权管理（DRM）服务。</p>
+<p>媒体传输协议（即通常所说的MTP）是“Windows Media”框架的一部分，从而与Windows Media Player密切相关。Windows系统从Windows XP SP2开始支持MTP。Windows XP需要安装Windows Media Player 10或更高版本来获得对MTP的支持。在这之后的系统则原生支持MTP。微软同时向Windows98之后的旧有操作系统提供MTP驱动包。OS X 和 Linux 各自拥有可支持MTP的升级软件包. (维基百科)</p>
+</blockquote>
+<p>mtp明显是ptp的升级版，从仅传输图片文件到传输媒体文件，包括音频视频文件。对于ptp协议和mtp协议的具体文件我也是都有看过一遍，mtp当中很多指令等都于ptp完全相同，在我看来就是新增了一些东西，新增的部分我也没有多看，项目进度原因，也没有深究。</p>
+<h2 id="PIMA15740-2000"><a href="#PIMA15740-2000" class="headerlink" title="PIMA15740:2000"></a>PIMA15740:2000</h2><p><a href="https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2012/jmv87/site/files/pima15740-2000.pdf" target="_blank" rel="external">文档下载</a><br>那么这个pima 15740又是什么呢</p>
+<blockquote>
+<p>The technical content of this PIMA standard is closely related to ISO 15740, which is currently<br>in the working draft stage while work on multiple transports is being completed. The main difference is that PIMA 15740  ncludes an informative annex describing a USB implementation of ISO 15740. This information is not included in ISO 15740,  hich instead references the USB still device class document developed by the Device Working Group of the USB Implementers Forum. The USB annex in PIMA 15740 provides the same technical approach as the USB still device class specification. The  eason for developing PIMA 15740 is to immediately provide a complete, fully documented, stable, publicly available pecification  or USB implementations of the Picture Transfer Protocol defined in ISO 15740. This will enable hardware and software   nufacturers to immediately produce product implementations, without waiting for the ISO and USB documents to complete the approval process. This PIMA 15740 standard may be withdrawn once the ISO 15740 and USB still device class documents have  een approved and are publicly available. </p>
+</blockquote>
+<p>上面这段话清楚地写出，pima15740 是usb实现的pima15740，就是为了提供一个完整的，稳定的，文档化的基于usb通信协议的iso15740，也就是基于usb的ptp协议。看到这里大家应该差不多明白了，我的需求基本上就是这个了。</p>
+<h2 id="实现分析"><a href="#实现分析" class="headerlink" title="实现分析"></a>实现分析</h2><h3 id="android-hardware-usb"><a href="#android-hardware-usb" class="headerlink" title="android.hardware.usb"></a>android.hardware.usb</h3><p>首先查看安卓官方文档会发现有一个<a href="https://developer.android.google.cn/reference/android/hardware/usb/package-summary.html" target="_blank" rel="external">android.hardware.usb</a>这样一个包，安卓本身提供了这样一套api用于获取连接在android手机上的usb设备，并且进行相应的通信。连接usb设备一共有两种模式，一种Host模式，一种Accessary模式，前者相当于android手机是老大，连接的设备是奴隶，手机可以进行任何操作；后一种是相当于连接的设备是老大，android手机是奴隶。具体可以看看<a href="http://www.voidcn.com/blog/Ever_GZ/article/p-4859973.html" target="_blank" rel="external">这篇文章</a>,百度也可以搜出来一大堆文章，基本上学习这个结合官方文档一般人都不会有问题，只要静下心来都不会有问题。</p>
+<p><img src="/img/android_usb.png" alt="android.hardware.usb"><br>不管如何跟相机通信，必须首先拿到连接到手机上的UsbDevice对象，才能进行下一步的操作。</p>
+<h3 id="android-mtp"><a href="#android-mtp" class="headerlink" title="android.mtp"></a>android.mtp</h3><p>接着会发现还有一个<a href="https://developer.android.google.cn/reference/android/mtp/package-summary.html" target="_blank" rel="external">android.mtp</a>的包，这个也是android自身实现的一个跟mtp设备通信的api。用法也十分简单，文档上面介绍的也是非常的详细，这里我简单介绍一下：<br><img src="/img/android_mtp.png" alt="android.hardware.usb"></p>
+<p>1、获取UsbDevice设备 和UsbDeviceConnection，获取看上一小节的链接<br>2、获取MtpDevice对象然后建立连接<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">MtpDevice mtpDevice = new MtpDevice(mUsbDevice);</div><div class="line">mtpDevice.open(mDeviceConnection)</div></pre></td></tr></table></figure><br>3、然后就可以用MtpDevice对象获取各种有用的信息，MtpDevice的方法也不多，直接点进去就可以看<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">close()</div><div class="line">deleteObject(int objectHandle)</div><div class="line">getDeviceId()</div><div class="line">getDeviceInfo()</div><div class="line">getDeviceName()</div><div class="line">getObject(int objectHandle, int objectSize)</div><div class="line">getObjectHandles(int storageId, int format, int objectHandle)</div><div class="line">getObjectInfo(int objectHandle)</div><div class="line">getParent(int objectHandle)</div><div class="line">getStorageId(int objectHandle)</div><div class="line">getStorageIds()</div><div class="line">getStorageInfo(int)</div><div class="line">getStorageInfo(int storageId)</div><div class="line">getThumbnail(int objectHandle)</div><div class="line">importFile(int objectHandle, String destPath)</div><div class="line">importFile(int objectHandle, ParcelFileDescriptor descriptor)</div><div class="line">open(UsbDeviceConnection connection)</div><div class="line">readEvent(CancellationSignal signal)</div><div class="line">sendObject(int objectHandle, long size, ParcelFileDescriptor descriptor)</div><div class="line">sendObjectInfo(MtpObjectInfo info)</div><div class="line">.</div><div class="line">.</div><div class="line">.</div><div class="line"></div></pre></td></tr></table></figure></p>
+<p>是不是很方便，看方法的字面意思基本上就知道用法了，用起来真的没难度，so easy，而且这里面的好多方法都是我需要的，你以为到这里就能解决我的问题了吗，一开始我也是这样人为的，后来才发现还是太年轻。。。</p>
+<p>mtp这个包其实就是google自身基于mtp和usb通信协议实现的，具体实现还是调用native方法实现的，所以我还看不到每个方法的具体实现细节。我用这一套api确实可以读取到相机中的所有文件，并且可以手动复制相机中的图片到手机中（注意是手动，和我的需求还有一些不同）。我需要的是自动复制，大家肯定看到了还有一个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">readEvent(CancellationSignal signal)</div></pre></td></tr></table></figure><br>这个方法可以接收相机的事件，当有新的图片的时候就会发送一个事件编号位ObjectAdded的事件，然后我就可以主动拉取这个照片了，是不是很完美。可是我用的时候又发现只有api24才能用。。。所以这个方案也不行了。除了这一点，还有一个致命的问题，那就是我有些手机通过这种方式连接到相机之后相机被锁定了，不能继续拍照了，关于这个问题我还和<a href="http://weibo.com/innost?is_all=1" target="_blank" rel="external">阿拉神农</a>,做了简单的交流，虽然没有解决问题，但是还是感谢他。这个问题后来我大致明白了，应该是不同手机在连接相机的时候对相机的mode进行了设置，所以会导致相机不能工作。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>通过这些坑，我明白了使用android现成的mtp包里面的接口暂时是无法实现我的需求了，一切有都得从长计议了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/26/yiyang/" rel="next" title="写给一阳的">
+                <i class="fa fa-chevron-left"></i> 写给一阳的
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/03/设计模式-单一职责原则/" rel="prev" title="设计模式----单一职责原则">
+                设计模式----单一职责原则 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTU5Ni84MTYw"></div>
+    
+  </div>
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/portrait.jpg"
+               alt="Turbo" />
+          <p class="site-author-name" itemprop="name">Turbo</p>
+          <p class="site-description motion-element" itemprop="description">记录我的想写下的东西</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PTP协议-picture-transfer-protocol"><span class="nav-number">1.</span> <span class="nav-text">PTP协议(picture transfer protocol)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MTP媒体传输协议（Media-Transfer-Protocol，MTP）"><span class="nav-number">2.</span> <span class="nav-text">MTP媒体传输协议（Media Transfer Protocol，MTP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PIMA15740-2000"><span class="nav-number">3.</span> <span class="nav-text">PIMA15740:2000</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现分析"><span class="nav-number">4.</span> <span class="nav-text">实现分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#android-hardware-usb"><span class="nav-number">4.1.</span> <span class="nav-text">android.hardware.usb</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#android-mtp"><span class="nav-number">4.2.</span> <span class="nav-text">android.mtp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">5.</span> <span class="nav-text">结语</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Turbo</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
