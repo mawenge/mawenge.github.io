@@ -332,7 +332,60 @@
       
         
           
-            
+            <p>##代理模式<br>即<strong>Proxy Pattern</strong>，什么是代理模式呢？</p>
+<blockquote>
+<p>为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。</p>
+<p>来自 百度百科</p>
+</blockquote>
+<p>所谓代理，就是调用对象的方法的时候没有直接调用该对象，而是生成一个代理对象，实际上是代理对象通过真实对象执行方法。</p>
+<p>为什么要这样做呢？我们接着往下看</p>
+<p>###组成<br><strong>抽象角色：</strong>通过接口或抽象类声明真实角色实现的业务方法。<br><strong>真实角色：</strong>实现抽象角色，定义真实角色所要实现的业务逻辑，供代理角色调用。<br><strong>代理角色：</strong>实现抽象角色，是真实角色的代理，通过真实角色的业务逻辑方法来实现抽象方法，并可以附加自己的操作。</p>
+<p>抽象角色声明方法，不提供具体实现；真实角色实现或者继承了抽象角色，实现了里面的方法。代理角色代理真实对象（当然代理角色也是可以直接代理抽象角色的，这个后续具体分析）<br><img src="./daili_1.png" alt="Alt text"></p>
+<p>###静态代理<br>抽象角色</p>
+<pre><code>public interface User{
+    void hello();
+}
+</code></pre><p>真实角色</p>
+<pre><code>public class UserImpl implements User{
+
+    @Override
+    public void hello() {
+        System.out.println(&quot;大家好，我是小明&quot;);
+    }
+}
+</code></pre><p>代理角色</p>
+<pre><code>public class UserProxy implements User{
+
+    private User user;
+
+    public UserProxy(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public void hello() {
+        long start = System.currentTimeMillis();
+        System.out.println(&quot;start   :   &quot; + start);
+        user.hello();
+        long end = System.currentTimeMillis();
+        System.out.println(&quot;end   :   &quot; + end);
+    }
+}
+</code></pre><p>生成静态代理工厂类</p>
+<pre><code>public class UserFactory {
+    public static User getInstance(){
+        return new UserProxy(new UserImpl());
+    }
+}
+</code></pre><p>使用</p>
+<pre><code>@Test
+public void staticProxyTest(){
+    User instance = UserFactory.getInstance();
+    instance.hello();
+}
+</code></pre><p>结果<br><img src="./daili_2.png" alt="Alt text"></p>
+<p>静态代理的优缺点：<br>优点：业务类只需要关注业务逻辑本身，保证了业务逻辑的重用性。<br>缺点：<br>1）代理对象的一个接口只服务于一种类型的对象，如果接口里面的方法很多，就要在每一个方法里面进行代理。<br>2）如果接口里面新增了方法，那么所有的代理类和实现类都要跟着改动。</p>
+
           
         
       
