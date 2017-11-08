@@ -92,13 +92,15 @@
 <meta property="og:site_name" content="MaWenge&#39;s Blog">
 <meta property="og:description" content="代理模式即Proxy Pattern，什么是代理模式呢？  为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。 来自 百度百科  所谓代理，就是调用对象的方法的时候没有直接调用该对象，而是生成一个代理对象，实际上是代理对象通过真实对象执行方法。 为什么要这样做呢？我们接着往下看 组成抽象角色：通">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2017/11/07/设计模式-代理模式/daili_1.png">
-<meta property="og:image" content="http://yoursite.com/2017/11/07/设计模式-代理模式/daili_2.png">
-<meta property="og:updated_time" content="2017-11-07T10:13:37.954Z">
+<meta property="og:image" content="http://yoursite.com/img/daili_1.png">
+<meta property="og:image" content="http://yoursite.com/img/daili_2.png">
+<meta property="og:image" content="http://yoursite.com/img/daili_3.png">
+<meta property="og:image" content="http://yoursite.com/img/daili_4.png">
+<meta property="og:updated_time" content="2017-11-08T10:03:40.918Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="设计模式----代理模式">
 <meta name="twitter:description" content="代理模式即Proxy Pattern，什么是代理模式呢？  为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。 来自 百度百科  所谓代理，就是调用对象的方法的时候没有直接调用该对象，而是生成一个代理对象，实际上是代理对象通过真实对象执行方法。 为什么要这样做呢？我们接着往下看 组成抽象角色：通">
-<meta name="twitter:image" content="http://yoursite.com/2017/11/07/设计模式-代理模式/daili_1.png">
+<meta name="twitter:image" content="http://yoursite.com/img/daili_1.png">
 
 
 
@@ -330,7 +332,7 @@
       
 
       
-        <h2 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h2><p>即<strong>Proxy Pattern</strong>，什么是代理模式呢？</p>
+        <h3 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h3><p>即<strong>Proxy Pattern</strong>，什么是代理模式呢？</p>
 <blockquote>
 <p>为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。</p>
 <p>来自 百度百科</p>
@@ -338,7 +340,7 @@
 <p>所谓代理，就是调用对象的方法的时候没有直接调用该对象，而是生成一个代理对象，实际上是代理对象通过真实对象执行方法。</p>
 <p>为什么要这样做呢？我们接着往下看</p>
 <h3 id="组成"><a href="#组成" class="headerlink" title="组成"></a>组成</h3><p><strong>抽象角色：</strong>通过接口或抽象类声明真实角色实现的业务方法。<br><strong>真实角色：</strong>实现抽象角色，定义真实角色所要实现的业务逻辑，供代理角色调用。<br><strong>代理角色：</strong>实现抽象角色，是真实角色的代理，通过真实角色的业务逻辑方法来实现抽象方法，并可以附加自己的操作。</p>
-<p>抽象角色声明方法，不提供具体实现；真实角色实现或者继承了抽象角色，实现了里面的方法。代理角色代理真实对象（当然代理角色也是可以直接代理抽象角色的，这个后续具体分析）<br><img src="./daili_1.png" alt="Alt text"></p>
+<p>抽象角色声明方法，不提供具体实现；真实角色实现或者继承了抽象角色，实现了里面的方法。代理角色代理真实对象（当然代理角色也是可以直接代理抽象角色的，这个后续具体分析）<br><img src="/img/daili_1.png" alt=""></p>
 <h3 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h3><p>抽象角色</p>
 <pre><code>public interface User{
     void hello();
@@ -381,8 +383,118 @@ public void staticProxyTest(){
     User instance = UserFactory.getInstance();
     instance.hello();
 }
-</code></pre><p>结果<br><img src="./daili_2.png" alt="Alt text"></p>
+</code></pre><p>结果</p>
+<center><br><img src="/img/daili_2.png" alt=""><br></center>
+
+
 <p>静态代理的优缺点：<br>优点：业务类只需要关注业务逻辑本身，保证了业务逻辑的重用性。<br>缺点：<br>1）代理对象的一个接口只服务于一种类型的对象，如果接口里面的方法很多，就要在每一个方法里面进行代理。<br>2）如果接口里面新增了方法，那么所有的代理类和实现类都要跟着改动。</p>
+<p>举例：代理可以对实现类进行统一管理，比如我们要查看一个方法的执行时间，就可以在代理类的实现方法中记录时间，而实现类的代码不需要做修改，这样就避免了修改具体的实现类。但是，如果每一个实现类都要实现这个功能的话，就需要添加多个代理类，以及代理类中凡是需要记录时间的方法都要实现统计时间的功能。<br>即 静态代理只能为特定接口服务，如果想要为多个接口服务则需要建立多个代理类</p>
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><p>根据上面的说法，静态代理的每一个代理类只能代理一个接口，如果被代理的类实现多个接口，那么，势必会产生多个代理类，这也是不可取的？动态代理的出现解决了这个问题</p>
+<p><strong>动态代理类的源码实在程序运行期间由jvm根据反射等机制动态生成，所以不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定的</strong></p>
+<p>Java动态代理有两种实现方式：<strong>jdk动态代理</strong>和<strong>cglib动态代理</strong>。两种方法同时存在，各有优劣。jdk动态代理是由java内部的反射机制来实现的，cglib动态代理底层则是借助asm来实现的。总的来说，反射机制在生成类的过程中比较高效，而asm在生成类之后的相关执行过程中比较高效（可以通过将asm生成的类进行缓存，这样解决asm生成类过程低效问题）。还有一点必须注意：jdk动态代理的应用前提，必须是目标类基于统一的接口。如果没有上述前提，jdk动态代理不能应用。由此可以看出，jdk动态代理有一定的局限性，cglib这种第三方类库实现的动态代理应用更加广泛，且在效率上更有优势。</p>
+<h4 id="jdk动态代理"><a href="#jdk动态代理" class="headerlink" title="jdk动态代理"></a>jdk动态代理</h4><pre><code>//接口1
+public interface Dog {
+    void bark();
+}
+
+//接口2
+public interface Fish {
+    void swim();
+}
+
+//实现类
+public class RealObject implements Dog, Fish {
+
+    @Override
+    public void bark() {
+        System.out.println(&quot;汪汪汪&quot;);
+    }
+
+    @Override
+    public void swim() {
+        System.out.println(&quot;~~~~~~~~~~~~~~~  swim  ~~~~~~~~~~~~~~~&quot;);
+    }
+}
+
+//InvocationHandler实现类
+public class InvocationHandlerImpl implements InvocationHandler {
+    private Object object;//被代理的真实类
+
+    //构造方法
+    public InvocationHandlerImpl(Object object) {
+        this.object = object;
+    }
+
+    /**
+     * @param proxy  被代理的对象
+     * @param method 要调用的方法
+     * @param args   方法调用时所传入的参数
+     * @return
+     * @throws Throwable
+     */
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println(&quot;开始代理。。。。。。&quot;); //方法被执行之前可以进行自定义操作
+        Object invoke = method.invoke(object, args);//执行被代理类的方法（这一步如果没有必要的话是可以省略的，比如retrofit的做法）
+        System.out.println(&quot;代理完了。。。。。。&quot;);//方法被执行之后也可以进行自定义操作
+        return invoke;
+    }
+}
+
+@Test
+public void test1() {
+    //真实对象
+    Object realObject = new RealObject();
+    //代理对象
+    Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), realObject.getClass().getInterfaces(), new InvocationHandlerImpl(realObject));
+    //代理对象执行方法
+    //这里的代理对象只能强转成接口对象，而且只能强转成单个接口对象执行接口中所声明的方法
+    ((Dog) proxy).bark();
+    System.out.println();
+    ((Fish) proxy).swim();
+}
+</code></pre><p>输出<br><img src="/img/daili_3.png" alt=""></p>
+<p>接口实现类如果没有必要的话是可以不用实现的，InvocationHandler 当中也不用传入被代理的对象，invoke方法中也不用调用Object invoke = method.invoke(object, args);这句话，只需要在invoke中做其他事情即可，Android当红网络框架Retrofit就是这样操作的，后续会有文章讲解。</p>
+<p>jdk动态代理说起来就是这几下，Proxy.newProxyInstance 生成代理对象，在invoke做操作，其他的其实也没有了。</p>
+<h4 id="cglib-动态代理"><a href="#cglib-动态代理" class="headerlink" title="cglib 动态代理"></a>cglib 动态代理</h4><p>Cglib是一个优秀的动态代理框架，它的底层使用ASM在内存中动态的生成被代理类的子类，使用CGLIB即使代理类没有实现任何接口也可以实现动态代理功能。CGLIB具有简单易用，它的运行速度要远远快于JDK的Proxy动态代理：</p>
+<p>CGLIB的核心类：<br>    net.sf.cglib.proxy.Enhancer – 主要的增强类<br>    net.sf.cglib.proxy.MethodInterceptor – 主要的方法拦截类，它是Callback接口的子接口，需要用户实现<br>    net.sf.cglib.proxy.MethodProxy – JDK的java.lang.reflect.Method类的代理类，可以方便的实现对源对象方法的调用,如使用：<br>    Object o = methodProxy.invokeSuper(proxy, args);<br>net.sf.cglib.proxy.MethodInterceptor接口是最通用的回调（callback）类型，它经常被基于代理的AOP用来实现拦截（intercept）方法的调用。这个接口只定义了一个方法<br>public Object intercept(Object object, java.lang.reflect.Method method,<br>Object[] args, MethodProxy proxy) throws Throwable;</p>
+<p>第一个参数是代理对像，第二和第三个参数分别是拦截的方法和方法的参数。原来的方法可能通过使用java.lang.reflect.Method对象的一般反射调用，或者使用 net.sf.cglib.proxy.MethodProxy对象调用。net.sf.cglib.proxy.MethodProxy通常被首选使用，因为它更快。</p>
+<pre><code>//真实类
+public static class Dog {
+    public void bark() {
+        System.out.println(&quot;汪汪汪~~~~~~~~~~~~~~~~~~~~~~&quot;);
+    }
+}
+
+public static class  CglibProxy implements MethodInterceptor {
+    private Object o;
+    public CglibProxy(Object o) {
+        this.o = o;
+    }
+
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        System.out.println(&quot;before      &quot; + methodProxy.getSuperName());
+        Object invoke = methodProxy.invoke(this.o, objects);//代理类调用真实对象执行方法
+        System.out.println(&quot;after      &quot; + methodProxy.getSuperName());
+        return invoke;
+    }
+}
+
+public static void main(String[] args){
+    Dog target = new Dog();
+    CglibProxy proxy = new CglibProxy(target);
+    Enhancer enhancer = new Enhancer();
+    enhancer.setSuperclass(target.getClass());
+    enhancer.setCallback(proxy);
+    //生成代理类
+    Dog dog = (Dog) enhancer.create();
+    dog.bark();
+}
+</code></pre><p>执行结果<br><img src="/img/daili_4.png" alt=""></p>
+<p>cglib实现了对实体类的动态代理，弥补了jdk动态代理只能对接口代理的缺陷<br>cglib的研究还是很不透彻，后续会有更深入的研究(Superclass has no null constructors but no arguments were given)，也遇到了问题，后续研究spring aop的时候会做深入研究。<br><a href="http://netfork.iteye.com/blog/286215" target="_blank" rel="external">通过CGLIB实现AOP的浅析（顺便简单对比了一下JDK的动态代理）</a></p>
+<h4 id="动态代理小结"><a href="#动态代理小结" class="headerlink" title="动态代理小结"></a>动态代理小结</h4><p>动态代理与静态代理相比较，最大的好处是接口中声明的所有方法都被转移到调用处理器一个集中的方法中处理（InvocationHandler.invoke）。这样，在接口方法数量比较多的时候，我们可以进行灵活处理，而不需要像静态代理那样每一个方法进行中转。在本示例中看不出来，因为invoke方法体内嵌入了具体的外围业务，实际中可以类似Spring AOP那样配置外围业务。 还可以根据方法的不同做不同的操作。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>代理的目的就是通过代理在核心主要任务执行的前后做一些其他操作，不影响核心业务代码，保证核心业务代码的纯净性。也有助于功能模块化，实现功能插拔式的操作，也就实现了解耦。例如访问Google，可以在访问之前做一个翻墙操作，然后再进行实质的网络请求。如果有一天不需要翻墙了，那么从项目中剥离翻墙代码也是很容易的。</p>
+<p>参考<br><a href="http://layznet.iteye.com/blog/1182924" target="_blank" rel="external">java静态代理和动态代理</a><br><a href="http://blog.csdn.net/hejingyuan6/article/details/36203505" target="_blank" rel="external"> JAVA学习篇–静态代理VS动态代理</a><br><a href="http://blog.csdn.net/heyutao007/article/details/49738887" target="_blank" rel="external">Java动态代理的两种实现方法</a></p>
 
       
     </div>
@@ -542,7 +654,7 @@ public void staticProxyTest(){
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#代理模式"><span class="nav-number">1.</span> <span class="nav-text">代理模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组成"><span class="nav-number">1.1.</span> <span class="nav-text">组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态代理"><span class="nav-number">1.2.</span> <span class="nav-text">静态代理</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#代理模式"><span class="nav-number">1.</span> <span class="nav-text">代理模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组成"><span class="nav-number">2.</span> <span class="nav-text">组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态代理"><span class="nav-number">3.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态代理"><span class="nav-number">4.</span> <span class="nav-text">动态代理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#jdk动态代理"><span class="nav-number">4.1.</span> <span class="nav-text">jdk动态代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cglib-动态代理"><span class="nav-number">4.2.</span> <span class="nav-text">cglib 动态代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态代理小结"><span class="nav-number">4.3.</span> <span class="nav-text">动态代理小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
