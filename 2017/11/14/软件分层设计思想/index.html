@@ -1,0 +1,662 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="架构," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="什么是分层我所理解的分层，是对    实现某个功能的过程    进行分层。实现功能的过程是由 很多服务有序组合完成，把相似的服务放在一层当中，把不相似的服务分开，简而言之，就是 对服务进行分层。 分层的应用分层的思想在各个领域可以说是随处可以看到 房屋建设我认为可以分为这几层 这里的实现的 功能 就是 建好房子并且卖出去。 我把中间涉及到的服务简单的分成了三层。最上层是地产商经营服务，主要负责房屋">
+<meta name="keywords" content="架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件分层设计思想">
+<meta property="og:url" content="http://yoursite.com/2017/11/14/软件分层设计思想/index.html">
+<meta property="og:site_name" content="MaWenge&#39;s Blog">
+<meta property="og:description" content="什么是分层我所理解的分层，是对    实现某个功能的过程    进行分层。实现功能的过程是由 很多服务有序组合完成，把相似的服务放在一层当中，把不相似的服务分开，简而言之，就是 对服务进行分层。 分层的应用分层的思想在各个领域可以说是随处可以看到 房屋建设我认为可以分为这几层 这里的实现的 功能 就是 建好房子并且卖出去。 我把中间涉及到的服务简单的分成了三层。最上层是地产商经营服务，主要负责房屋">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img/layer/dichan.png">
+<meta property="og:image" content="http://yoursite.com/img/layer/1.png">
+<meta property="og:image" content="http://yoursite.com/img/layer/2.png">
+<meta property="og:image" content="http://yoursite.com/img/layer/3.png">
+<meta property="og:image" content="http://yoursite.com/img/layer/4.png">
+<meta property="og:updated_time" content="2017-11-14T07:47:11.337Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="软件分层设计思想">
+<meta name="twitter:description" content="什么是分层我所理解的分层，是对    实现某个功能的过程    进行分层。实现功能的过程是由 很多服务有序组合完成，把相似的服务放在一层当中，把不相似的服务分开，简而言之，就是 对服务进行分层。 分层的应用分层的思想在各个领域可以说是随处可以看到 房屋建设我认为可以分为这几层 这里的实现的 功能 就是 建好房子并且卖出去。 我把中间涉及到的服务简单的分成了三层。最上层是地产商经营服务，主要负责房屋">
+<meta name="twitter:image" content="http://yoursite.com/img/layer/dichan.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/14/软件分层设计思想/"/>
+
+
+
+
+
+  <title> 软件分层设计思想 | MaWenge's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">MaWenge's Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/14/软件分层设计思想/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Turbo">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/portrait.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="MaWenge's Blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="MaWenge's Blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                软件分层设计思想
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-14T15:43:12+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/14/软件分层设计思想/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/14/软件分层设计思想/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="什么是分层"><a href="#什么是分层" class="headerlink" title="什么是分层"></a>什么是分层</h3><p>我所理解的分层，是对    <strong>实现某个功能的过程</strong>    进行分层。实现功能的过程是由 <strong>很多服务有序组合完成</strong>，把相似的服务放在一层当中，把不相似的服务分开，简而言之，就是 <strong>对服务进行分层</strong>。</p>
+<h3 id="分层的应用"><a href="#分层的应用" class="headerlink" title="分层的应用"></a>分层的应用</h3><p>分层的思想在各个领域可以说是随处可以看到</p>
+<h4 id="房屋建设"><a href="#房屋建设" class="headerlink" title="房屋建设"></a>房屋建设</h4><p>我认为可以分为这几层<br><img src="/img/layer/dichan.png" alt=""></p>
+<p>这里的实现的 <strong>功能</strong> 就是 <strong>建好房子并且卖出去</strong>。 我把中间涉及到的服务简单的分成了三层。最上层是地产商经营服务，主要负责房屋销售、融资筹钱等服务；第二层是建筑承包服务，主要负责房屋的建设服务，它接受地产商的指示，最终提供给地产商符合要求的产品；第三层是原料供应商，它负责接受建筑承包商的指示，提供给建筑承包商符合要求的产品。<br>都是上层向下层索要特定需求的产品，下层根据需求提供给上层符合条件的产品，双方都不需要知道对方的实现细节。</p>
+<h4 id="网络传输模型"><a href="#网络传输模型" class="headerlink" title="网络传输模型"></a>网络传输模型</h4><p><img src="/img/layer/1.png" alt=""></p>
+<p>数据在一个网络中的两台机器之间传输，可以说数据就是在这些层当中不断的流动，最终达到了传输数据的目的。  </p>
+<p>首先，每一层实现的功能不同<br><strong>应用层：</strong>OSI参考模型中最靠近用户的一层，是为计算机用户提供应用接口，也为用户直接提供各种网络服务。<br><strong>表示层：</strong>应用层数据的编码和转换功能。用于将计算机内部的多种数据格式转换成通信中采用的标准表示形式。<br><strong>会话层：</strong>会话层就是负责建立、管理和终止表示层实体之间的通信会话。该层的通信由不同设备中的应用程序之间的服务请求和响应组成。<br><strong>传输层：</strong>传输层建立了主机端到端的链接，传输层的作用是为上层协议提供端到端的可靠和透明的数据传输服务，包括处理差错控制和流量控制等问题。该层向高层屏蔽了下层数据通信的细节，使高层用户看到的只是在两个传输实体间的一条主机到主机的、可由用户控制和设定的、可靠的数据通路。我们通常说的，TCP UDP就是在这一层。端口号既是这里的“端”。<br><strong>网络层：</strong>本层通过IP寻址来建立两个节点之间的连接，为源端的运输层送来的分组，选择合适的路由和交换节点，正确无误地按照地址传送给目的端的运输层。就是通常说的IP层。这一层就是我们经常说的IP协议层。IP协议是Internet的基础。<br><strong>数据链路层：</strong>将比特组合成字节,再将字节组合成帧,使用链路层地址 (以太网使用MAC地址)来访问介质,并进行差错检测。<br><strong>物理层：</strong>实际最终信号的传输是通过物理层实现的。通过物理介质传输比特流。  </p>
+<p>其次，实现每一层功能的对象是不同的<br><img src="/img/layer/2.png" alt=""><br>其中应用层（会话层、表示层、应用层）大多通过软件实现其功能。可以说每一层都有专业的对象负责实现本层的功能。</p>
+<p>再其次，每一层遵守的协议也不同<br><img src="/img/layer/3.png" alt="">  </p>
+<p><strong>每一层的工作都很明确，从上层接收数据（对于应用层直接传递给下层），根据协议处理或者传输数据，再把数据传递给下一层（对于物理层从上层接收数据传递后继续传递给上层）。每一层只负责依据协议读取数据，处理数据，传递数据。不需要了解上层或者下层的实现细节。如此只要每一层都做好自己的事情，最终就能达到数据传输的目的。</strong><br>这里实现的<strong>功能</strong>就是<strong>完成数据传输</strong>，每一层都提供了服务，最终合起来就共同实现了功能。</p>
+<h4 id="后端服务架构"><a href="#后端服务架构" class="headerlink" title="后端服务架构"></a>后端服务架构</h4><p>这里介绍一下目前我自己后端服务的分层架构，也是参考了网络上一些通用的架构方案，没有什么技术含量。<br><img src="/img/layer/4.png" alt=""><br><strong>database layer：</strong>数据库服务，用的是阿里云的rds，基本上就是配置一下就行了。<br><strong>persistence layer：</strong>持久层，用于与数据库直接交互，主要就是增删改查，我用的是mybatis，其实也叫dao层，主要包括定义好的一些mapper的xml文件和接口文件。这里可以把功能抽象在接口里面，用以适配不同的数据库服务。<br><strong>service layer：</strong>服务层，这部分应该是对持久层做了一些原子性更大一些的组合。我个人认为这一部分的思想可以跟关系型数据库的<strong>存储过程</strong>很相似。<br><strong>business layer：</strong>业务层，这里涉及到的就是具体的业务了。比如现在的项目是共享电瓶车租赁。相关的业务就会有租还车，车辆管理等等。业务层可以直接调用持久层，也可以调用服务层。<br><strong>presentation layer：</strong>展示层，负责处理所有的界面展示以及交互逻辑。目前的业务主要就是对移动端请求的处理，现在主要就是各种controller，后台静态页面部署在另一台机器上。</p>
+<p>其他一些权限过滤、异常处理等这里暂时先不考虑。</p>
+<p>spring框架下的这种架构实现起来也非常容易，代码看起来也很清爽，维护起来也没有什么很大的问题。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>不难发现，分层的思想在生活当中随处可见，分层真的就是一种正确实用的方案吗？这个也是要根据需求以及实际情况衡量。这里我们只讨论分层特点。 </p>
+<p>1 分层易于实现分工，每一层人员负责的不同，只需要专注自己的业务即可。<br>2 分层易于实现代码复用，这也是分层出现的一个直接原因。<br>3 分层易于测试。由于实现了分层，功能粒度理论上是可以做到很细，单元测试用例编写也会非常灵活。</p>
+<p>参考<br><a href="http://blog.csdn.net/bboyfeiyu/article/details/45136299" target="_blank" rel="external">软件架构模式之分层架构</a><br><a href="http://www.infoq.com/cn/articles/several-pain-points-architecture-design" target="_blank" rel="external">针对架构设计的几个痛点，我总结出的架构原则和模式</a><br><a href="https://www.cnblogs.com/qishui/p/5428938.html" target="_blank" rel="external">OSI七层模型与TCP/IP五层模型</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/07/设计模式-代理模式/" rel="next" title="设计模式----代理模式">
+                <i class="fa fa-chevron-left"></i> 设计模式----代理模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTU5Ni84MTYw"></div>
+    
+  </div>
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/portrait.jpg"
+               alt="Turbo" />
+          <p class="site-author-name" itemprop="name">Turbo</p>
+          <p class="site-description motion-element" itemprop="description">记录我的想写下的东西</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是分层"><span class="nav-number">1.</span> <span class="nav-text">什么是分层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分层的应用"><span class="nav-number">2.</span> <span class="nav-text">分层的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#房屋建设"><span class="nav-number">2.1.</span> <span class="nav-text">房屋建设</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络传输模型"><span class="nav-number">2.2.</span> <span class="nav-text">网络传输模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后端服务架构"><span class="nav-number">2.3.</span> <span class="nav-text">后端服务架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Turbo</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
