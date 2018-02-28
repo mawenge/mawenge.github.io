@@ -242,6 +242,149 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/28/一次线上内存泄漏排查/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Turbo">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/portrait.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="MaWenge's Blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="MaWenge's Blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/02/28/一次线上内存泄漏排查/" itemprop="url">
+                  一次线上内存泄漏排查
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2018-02-28T14:25:32+08:00">
+                2018-02-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/28/一次线上内存泄漏排查/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/02/28/一次线上内存泄漏排查/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h4><p>2017春节前夕，车辆服务每隔三四天会出现宕机，周期也比较稳定，基本就是维持在三四天左右。宕机的原因是堆内存溢出。<br>初步判断造成内存溢出的原因是发生了内存泄漏，大量堆内的无用对象无法被回收，导致新车创建的对象无法申请到足够的空间。</p>
+<h4 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h4><p>由于是过年期间，技术部所有人都放假回家，服务负责人在家中进行问题排查，也没有发现什么头绪。由于马上春节，用户量会逐渐减少到0，业务量也不是很大。所以就暂时的应对方案是每隔两天手动重启一次服务，这种临时性的解决方案帮助我们度过了假期期间的业务。</p>
+<p>年后回来，正式开始排查问题。2018/02/26上午，服务刚刚被重启，在阿里云后台监测ecs发现运行正常。8g的内存监控后台显示使用了2g，看似正常，并且所有请求处理也正常。连到服务后台进行查看。</p>
+<p>查看虚拟机启动参数<br><img src="/img/memory_leak/1.png" alt=""><br>可以看出最大堆内存为 2051014656/(1024 * 1024) = 1956M。<br>查看进程内存cpu占用情况<br><img src="/img/memory_leak/2.png" alt=""><br>可以看到20814进程总共占用内存1.414g。<br>现在看起来都一切正常</p>
+<p>再看一下gc的情况，每隔10秒采一次样<br><img src="/img/memory_leak/3.png" alt=""><br>可以看出，到目前为止，每次新生代回收一次需要大概22ms，fullgc总共发生了11次，查询进程启动时间为31.5小时<br><img src="/img/memory_leak/4.png" alt=""><br>fullgc相当于每2.86小时发生一次，每次fullgc使用的时间为5350/11=486ms，还算正常。</p>
+<p>到目前为止没有发现异常，主要是服务启动时间也不长，但是如果等到服务不行的时候再次查看数据，这无疑拉长了问题解决周期，并且春节过后业务量逐渐恢复正常，问题出现的周期很有可能缩短。</p>
+<p>所以，需要查看当前堆中内存分布情况。<br>整体思路有两个：<br>1 使用jdk自带的visualvm工具分析，最终放弃，原因主要有：<br>    1）服务器不好直接运行visualvm这种可视化工具，visualvm可以支持连接远程服务器，但是貌似不好用，<br>    2）visualvm对堆内对象分析功能不够强大，有些类型信息不能完整显示，而且没法显示引用关系。<br>这些都不能帮助我有效分析当前内存快照的情况。</p>
+<p>2 还有就是使用jmap + mat组合。把进程当前内存快照保存成文件然后传到本地使用mat工具进行分析<br><img src="/img/memory_leak/5.png" alt=""><br>这里一定要在登录用户为创建进程的用户的时候执行相关命令，否则会出现process not found的情况。<br>然后把生成的文件传到本地，使用mat分析。mat就是Memory Analyzer (MAT)，它是eclipse的一个插件。用来分析二进制堆文件。</p>
+<p>由上图可以知道，进程启动时间是   <strong>2018/02/26 08:58:29</strong></p>
+<p>在 <strong>2018/02/26 16:44:00</strong>我做了一次内存快照如下图<br><img src="/img/memory_leak/8.png" alt=""><br><img src="/img/memory_leak/9.png" alt=""><br>总内存138.6MB，其中54.6MB疑似内存泄漏，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig。</p>
+<p>在 <strong>2018/02/27 09:48:00</strong>，再次做内存快照<br><img src="/img/memory_leak/10.png" alt=""><br><img src="/img/memory_leak/11.png" alt=""><br>此时可以发现，意思泄漏内存增长到175MB，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig。</p>
+<p>在 <strong>2018/02/28 10:02:00</strong>，再次做内存快照<br><img src="/img/memory_leak/12.png" alt=""><br><img src="/img/memory_leak/13.png" alt=""><br><img src="/img/memory_leak/14.png" alt=""><br>此时疑似泄漏内存增加到两处，一处是349.3MB，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig，<br>还有一处是51.6MB，泄漏对象类型是java.lang.ref.Finalizer。</p>
+<h4 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h4><p>从上面三次做的内存快照可以看出，主要泄漏的对象就是com.taobao.txc.common.config.ConsoleConfig，可以看出是在ConcurentHashMap大量保存了该对象，查看该对象引用关系如下<br><img src="/img/memory_leak/15.png" alt=""></p>
+<p>这个类是我们项目中引用分布式事务组件当中的类，年前有一次升级，现在想起来就是升级之后才出现了这个问题。我们马上联系了分布式事务gts的同学，把这个问题反馈给了他们，他们发现后也很重视，马上就开始排查，到了下午就已经出了一个临时的紧急修复jar包。我们也马上更换并且重新部署所有相关服务。</p>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>本次的泄漏问题还算比较温和，没有立刻使服务挂掉，基本上是三四天逐渐加剧，最终导致内存占满，服务奔溃。这就给了我们比较充足的时间来排查分析问题。从这次也验证了jmap + mat分析线上服务的能力非常强大。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/09/筋斗云架构演进/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -284,7 +427,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-09T17:18:40+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-12-09T17:18:40+08:00">
                 2017-12-09
               </time>
             
@@ -471,7 +614,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-14T15:43:12+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-11-14T15:43:12+08:00">
                 2017-11-14
               </time>
             
@@ -617,7 +760,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-07T16:08:13+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-11-07T16:08:13+08:00">
                 2017-11-07
               </time>
             
@@ -908,7 +1051,7 @@ public static void main(String[] args){
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-29T13:50:04+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-10-29T13:50:04+08:00">
                 2017-10-29
               </time>
             
@@ -1036,7 +1179,7 @@ public static void main(String[] args){
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-03T21:51:54+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-02-03T21:51:54+08:00">
                 2017-02-03
               </time>
             
@@ -1191,7 +1334,7 @@ public static void main(String[] args){
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-07T17:01:06+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-01-07T17:01:06+08:00">
                 2017-01-07
               </time>
             
@@ -1344,7 +1487,7 @@ public static void main(String[] args){
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-26T22:50:04+08:00">
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2016-12-26T22:50:04+08:00">
                 2016-12-26
               </time>
             
@@ -1466,7 +1609,7 @@ public static void main(String[] args){
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1477,7 +1620,7 @@ public static void main(String[] args){
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

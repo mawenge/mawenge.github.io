@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="问题排查," />
 
 
 
@@ -84,20 +84,32 @@
 
 
 
-<meta name="description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta name="description" content="问题描述2017春节前夕，车辆服务每隔三四天会出现宕机，周期也比较稳定，基本就是维持在三四天左右。宕机的原因是堆内存溢出。初步判断造成内存溢出的原因是发生了内存泄漏，大量堆内的无用对象无法被回收，导致新车创建的对象无法申请到足够的空间。 问题排查由于是过年期间，技术部所有人都放假回家，服务负责人在家中进行问题排查，也没有发现什么头绪。由于马上春节，用户量会逐渐减少到0，业务量也不是很大。所以就暂时">
+<meta name="keywords" content="问题排查">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式----单一职责原则">
-<meta property="og:url" content="http://yoursite.com/2017/02/03/设计模式-单一职责原则/index.html">
+<meta property="og:title" content="一次线上内存泄漏排查">
+<meta property="og:url" content="http://yoursite.com/2018/02/28/一次线上内存泄漏排查/index.html">
 <meta property="og:site_name" content="MaWenge&#39;s Blog">
-<meta property="og:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta property="og:description" content="问题描述2017春节前夕，车辆服务每隔三四天会出现宕机，周期也比较稳定，基本就是维持在三四天左右。宕机的原因是堆内存溢出。初步判断造成内存溢出的原因是发生了内存泄漏，大量堆内的无用对象无法被回收，导致新车创建的对象无法申请到足够的空间。 问题排查由于是过年期间，技术部所有人都放假回家，服务负责人在家中进行问题排查，也没有发现什么头绪。由于马上春节，用户量会逐渐减少到0，业务量也不是很大。所以就暂时">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/img/1.png">
-<meta property="og:image" content="http://yoursite.com/img/2.png">
-<meta property="og:updated_time" content="2017-11-06T01:32:29.034Z">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/1.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/2.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/3.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/4.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/5.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/8.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/9.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/10.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/11.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/12.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/13.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/14.png">
+<meta property="og:image" content="http://yoursite.com/img/memory_leak/15.png">
+<meta property="og:updated_time" content="2018-02-28T06:41:39.871Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式----单一职责原则">
-<meta name="twitter:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
-<meta name="twitter:image" content="http://yoursite.com/img/1.png">
+<meta name="twitter:title" content="一次线上内存泄漏排查">
+<meta name="twitter:description" content="问题描述2017春节前夕，车辆服务每隔三四天会出现宕机，周期也比较稳定，基本就是维持在三四天左右。宕机的原因是堆内存溢出。初步判断造成内存溢出的原因是发生了内存泄漏，大量堆内的无用对象无法被回收，导致新车创建的对象无法申请到足够的空间。 问题排查由于是过年期间，技术部所有人都放假回家，服务负责人在家中进行问题排查，也没有发现什么头绪。由于马上春节，用户量会逐渐减少到0，业务量也不是很大。所以就暂时">
+<meta name="twitter:image" content="http://yoursite.com/img/memory_leak/1.png">
 
 
 
@@ -125,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/02/28/一次线上内存泄漏排查/"/>
 
 
 
 
 
-  <title> 设计模式----单一职责原则 | MaWenge's Blog </title>
+  <title> 一次线上内存泄漏排查 | MaWenge's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -244,7 +256,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/28/一次线上内存泄漏排查/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Turbo">
@@ -268,7 +280,7 @@
             
             
               
-                设计模式----单一职责原则
+                一次线上内存泄漏排查
               
             
           </h1>
@@ -283,8 +295,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2017-02-03T21:51:54+08:00">
-                2017-02-03
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2018-02-28T14:25:32+08:00">
+                2018-02-28
               </time>
             
 
@@ -302,8 +314,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/02/03/设计模式-单一职责原则/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/03/设计模式-单一职责原则/" itemprop="commentCount"></span>
+                <a href="/2018/02/28/一次线上内存泄漏排查/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/02/28/一次线上内存泄漏排查/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -329,33 +341,21 @@
       
 
       
-        <h2 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h2><p>面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础</p>
-<ol>
-<li><strong>单一职责原则</strong></li>
-<li><strong>里氏替换原则</strong></li>
-<li><strong>依赖倒置原则</strong></li>
-<li><strong>接口隔离原则</strong></li>
-<li><strong>迪米特法则</strong></li>
-<li><strong>开闭原则</strong></li>
-</ol>
-<p>如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。如果发现有不准确的地方，欢迎留言交流，共同进步。</p>
-<h2 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h2><p>单一职责的英文名称是<strong>Single Responsibility Principle</strong>，简称SRP。SRP原话解释如下：</p>
-<blockquote>
-<p>There should never be more than one reason for a class to change<br>应该有且只有一个原因引起类的变更</p>
-</blockquote>
-<p>其实单一职责这句话本身就已经说得很清楚了，就是一个类只负责一件事，不负责其他的事情。而能够引起这个类变化的原因也是只有这个类负责的事情。</p>
-<p>这里举一个例子，也是书上的例子：<br>打电话需要四个过程，拨号、通话、回应、挂机，现在写一个接口如下<br><img src="/img/1.png" alt=""></p>
-<p>这三个方法都是电话的功能，把他们全都放在IPhone的接口中也是非常合理的。而且它就负责一件事，电话的事情，但只有一个原因引起变化吗？好像不是<br>IPhone这个接口其实有两个职责：一是协议管理，二是数据传送。dial() hangup()实现的是协议管理，分别负责拨号接通和挂机；chat()实现的是数据的传送，把模拟信号转换成数字信号等等。协议的变化和数据传送的变化都能够引起接口或实现类的变化。那么协议控制和数据传送之间相互依赖吗？电话拨号，我们只要接通就成，甭管是电信还是网通的协议；电话接通后我们也不关心传递的是什么数据。通过这样的分析我们发现类图上的IPhone接口包含了两个职责，而且这两个职责的变化不会相互影响，那就考虑拆分成两个接口<br><img src="/img/2.png" alt=""></p>
-<p>那么这么做到底能有什么好处呢，请看下面：</p>
-<ol>
-<li><p>我们使用的是面向接口的编程，所以暴露给使用者的是两个接口类型IConnectionManager和IDataTransfer。使用者只能调用接口中声明的方法。面向接口编程实现了方法的隔离，使得使用者只需要使用方法即可，不需要知道具体实现，并且只能使用该接口的方法。所以在业务层面与协议有关的就是IConnectionManager，而与数据传输相关的就是IDataTransfer，到时候如果修改了接口里面的内容，业务调用层需要修改的内容范围也会减小（例如如果修改了数据传输IDataTransfer，那么业务层只需要修改IDataTransfer有关的内容，IConnectionManager相关的内容则完全不用修改，找起来也方便一点，如果没有拆分成两个接口，那么就要找到所有IPhone接口使用的地方一一检查）</p>
-</li>
-<li><p>这里的实现类Phone仍然实现了打电话有关的所有功能，只不过对于不同的使用情况通过接口类型暴露不同的方法给调用者。那么有人肯定要问为什么不定义两个实现类分别实现IConnectionManager和IDataManager，然后分别把两个实现类的对象传递给接口对象。这里IConnectionManager和IDataManager的实现方法如果要共享数据的话，那么让Phone类同时实现IConnectionManager和IDataManager接口，这样就可以很方便的在类内部维护共享数据以及状态，而通过接口对外暴露功能方法，类的结构也很清晰。还有一种就是Phone类组合IConnectionManager和IDataManager的实现类，但是组合是一种强耦合关系，而且还增加了类的复杂性，多了两个类，还不如直接让Phone类实现IConnectionManager和IDataManager接口。</p>
-</li>
-</ol>
-<p>单一职责原则提出了一个编写程序的标准，用“职责”或“变化原因”来衡量接口或类设计得是否优良，但是“职责”和“变化原因”都是不可度量的，因项目而异，因环境而异。</p>
-<p>上面的例子从功能上来说，定义一个IPhone接口来说也是没有错的，实现了电话的功能，而且设计还很简单，仅仅定义一个接口和一个实现类。但是确实是有两个可以变化的原因放到了一个接口里面，这就为以后的变化带来了风险。如果以后模拟电话升级到数字电话，我们提供的接口IPhone是不是要修改了？接口修改对其他的Invoker类是不是有很大的影响？</p>
-<p>单一职责适用于接口、类，同时也适用于方法。一个方法尽量做一件事。我相信大多数人编程的时候突然发现接下来要写的一段代码以前好像写过，然后回去把那段代码又提取出来变成一个单独的方法。这就时前面设计方法的时候做了太多事情，粒度太大了，相信大多数人多方法的单一职责还是比较容易理解的。</p>
+        <h4 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h4><p>2017春节前夕，车辆服务每隔三四天会出现宕机，周期也比较稳定，基本就是维持在三四天左右。宕机的原因是堆内存溢出。<br>初步判断造成内存溢出的原因是发生了内存泄漏，大量堆内的无用对象无法被回收，导致新车创建的对象无法申请到足够的空间。</p>
+<h4 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h4><p>由于是过年期间，技术部所有人都放假回家，服务负责人在家中进行问题排查，也没有发现什么头绪。由于马上春节，用户量会逐渐减少到0，业务量也不是很大。所以就暂时的应对方案是每隔两天手动重启一次服务，这种临时性的解决方案帮助我们度过了假期期间的业务。</p>
+<p>年后回来，正式开始排查问题。2018/02/26上午，服务刚刚被重启，在阿里云后台监测ecs发现运行正常。8g的内存监控后台显示使用了2g，看似正常，并且所有请求处理也正常。连到服务后台进行查看。</p>
+<p>查看虚拟机启动参数<br><img src="/img/memory_leak/1.png" alt=""><br>可以看出最大堆内存为 2051014656/(1024 * 1024) = 1956M。<br>查看进程内存cpu占用情况<br><img src="/img/memory_leak/2.png" alt=""><br>可以看到20814进程总共占用内存1.414g。<br>现在看起来都一切正常</p>
+<p>再看一下gc的情况，每隔10秒采一次样<br><img src="/img/memory_leak/3.png" alt=""><br>可以看出，到目前为止，每次新生代回收一次需要大概22ms，fullgc总共发生了11次，查询进程启动时间为31.5小时<br><img src="/img/memory_leak/4.png" alt=""><br>fullgc相当于每2.86小时发生一次，每次fullgc使用的时间为5350/11=486ms，还算正常。</p>
+<p>到目前为止没有发现异常，主要是服务启动时间也不长，但是如果等到服务不行的时候再次查看数据，这无疑拉长了问题解决周期，并且春节过后业务量逐渐恢复正常，问题出现的周期很有可能缩短。</p>
+<p>所以，需要查看当前堆中内存分布情况。<br>整体思路有两个：<br>1 使用jdk自带的visualvm工具分析，最终放弃，原因主要有：<br>    1）服务器不好直接运行visualvm这种可视化工具，visualvm可以支持连接远程服务器，但是貌似不好用，<br>    2）visualvm对堆内对象分析功能不够强大，有些类型信息不能完整显示，而且没法显示引用关系。<br>这些都不能帮助我有效分析当前内存快照的情况。</p>
+<p>2 还有就是使用jmap + mat组合。把进程当前内存快照保存成文件然后传到本地使用mat工具进行分析<br><img src="/img/memory_leak/5.png" alt=""><br>这里一定要在登录用户为创建进程的用户的时候执行相关命令，否则会出现process not found的情况。<br>然后把生成的文件传到本地，使用mat分析。mat就是Memory Analyzer (MAT)，它是eclipse的一个插件。用来分析二进制堆文件。</p>
+<p>由上图可以知道，进程启动时间是   <strong>2018/02/26 08:58:29</strong></p>
+<p>在 <strong>2018/02/26 16:44:00</strong>我做了一次内存快照如下图<br><img src="/img/memory_leak/8.png" alt=""><br><img src="/img/memory_leak/9.png" alt=""><br>总内存138.6MB，其中54.6MB疑似内存泄漏，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig。</p>
+<p>在 <strong>2018/02/27 09:48:00</strong>，再次做内存快照<br><img src="/img/memory_leak/10.png" alt=""><br><img src="/img/memory_leak/11.png" alt=""><br>此时可以发现，意思泄漏内存增长到175MB，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig。</p>
+<p>在 <strong>2018/02/28 10:02:00</strong>，再次做内存快照<br><img src="/img/memory_leak/12.png" alt=""><br><img src="/img/memory_leak/13.png" alt=""><br><img src="/img/memory_leak/14.png" alt=""><br>此时疑似泄漏内存增加到两处，一处是349.3MB，泄漏对象类型是com.taobao.txc.common.config.ConsoleConfig，<br>还有一处是51.6MB，泄漏对象类型是java.lang.ref.Finalizer。</p>
+<h4 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h4><p>从上面三次做的内存快照可以看出，主要泄漏的对象就是com.taobao.txc.common.config.ConsoleConfig，可以看出是在ConcurentHashMap大量保存了该对象，查看该对象引用关系如下<br><img src="/img/memory_leak/15.png" alt=""></p>
+<p>这个类是我们项目中引用分布式事务组件当中的类，年前有一次升级，现在想起来就是升级之后才出现了这个问题。我们马上联系了分布式事务gts的同学，把这个问题反馈给了他们，他们发现后也很重视，马上就开始排查，到了下午就已经出了一个临时的紧急修复jar包。我们也马上更换并且重新部署所有相关服务。</p>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><p>本次的泄漏问题还算比较温和，没有立刻使服务挂掉，基本上是三四天逐渐加剧，最终导致内存占满，服务奔溃。这就给了我们比较充足的时间来排查分析问题。从这次也验证了jmap + mat分析线上服务的能力非常强大。</p>
 
       
     </div>
@@ -377,13 +377,19 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/问题排查/" rel="tag"># 问题排查</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/01/07/android-ptp-编程（1）/" rel="next" title="android ptp 编程（1）">
-                <i class="fa fa-chevron-left"></i> android ptp 编程（1）
+              <a href="/2017/12/09/筋斗云架构演进/" rel="next" title="筋斗云架构演进">
+                <i class="fa fa-chevron-left"></i> 筋斗云架构演进
               </a>
             
           </div>
@@ -391,10 +397,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/10/29/新建文章标题/" rel="prev" title="新建文章标题">
-                新建文章标题 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -524,7 +526,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计原则"><span class="nav-number">1.</span> <span class="nav-text">设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单一职责原则"><span class="nav-number">2.</span> <span class="nav-text">单一职责原则</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题排查"><span class="nav-number">2.</span> <span class="nav-text">问题排查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题分析"><span class="nav-number">3.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>
