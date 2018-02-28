@@ -84,20 +84,24 @@
 
 
 
-<meta name="description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta name="description" content="给大家介绍一个简单的翻墙的方法 现状由于为了网络安全，大量提供VPN服务的公司被关掉，以前那种虽然网速不快的付费翻墙服务也没法用了。以前同事还在自己的服务器上搭建了一个VPN服务，但是接连收到阿里云的消息，吓得赶紧关掉。顶多使用一些镜像Google来查询问题，但是也会出现不能用的时候，十分不方便。 解决方案条件：一台服务器 +  xshell + chrome + SwitchySharp扩展程序">
 <meta property="og:type" content="article">
-<meta property="og:title" content="设计模式----单一职责原则">
-<meta property="og:url" content="http://yoursite.com/2017/02/03/设计模式-单一职责原则/index.html">
+<meta property="og:title" content="自己搭梯子">
+<meta property="og:url" content="http://yoursite.com/2018/02/28/自己搭梯子/index.html">
 <meta property="og:site_name" content="MaWenge&#39;s Blog">
-<meta property="og:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
+<meta property="og:description" content="给大家介绍一个简单的翻墙的方法 现状由于为了网络安全，大量提供VPN服务的公司被关掉，以前那种虽然网速不快的付费翻墙服务也没法用了。以前同事还在自己的服务器上搭建了一个VPN服务，但是接连收到阿里云的消息，吓得赶紧关掉。顶多使用一些镜像Google来查询问题，但是也会出现不能用的时候，十分不方便。 解决方案条件：一台服务器 +  xshell + chrome + SwitchySharp扩展程序">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/img/1.png">
-<meta property="og:image" content="http://yoursite.com/img/2.png">
-<meta property="og:updated_time" content="2017-11-06T01:32:29.034Z">
+<meta property="og:image" content="http://yoursite.com/img/vpn/1.png">
+<meta property="og:image" content="http://yoursite.com/img/vpn/2.png">
+<meta property="og:image" content="http://yoursite.com/img/vpn/3.png">
+<meta property="og:image" content="http://yoursite.com/img/vpn/4.png">
+<meta property="og:image" content="http://yoursite.com/img/vpn/5.png">
+<meta property="og:image" content="http://yoursite.com/img/vpn/6.png">
+<meta property="og:updated_time" content="2018-02-28T07:57:30.410Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="设计模式----单一职责原则">
-<meta name="twitter:description" content="设计原则面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础  单一职责原则 里氏替换原则 依赖倒置原则 接口隔离原则 迪米特法则 开闭原则  如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。">
-<meta name="twitter:image" content="http://yoursite.com/img/1.png">
+<meta name="twitter:title" content="自己搭梯子">
+<meta name="twitter:description" content="给大家介绍一个简单的翻墙的方法 现状由于为了网络安全，大量提供VPN服务的公司被关掉，以前那种虽然网速不快的付费翻墙服务也没法用了。以前同事还在自己的服务器上搭建了一个VPN服务，但是接连收到阿里云的消息，吓得赶紧关掉。顶多使用一些镜像Google来查询问题，但是也会出现不能用的时候，十分不方便。 解决方案条件：一台服务器 +  xshell + chrome + SwitchySharp扩展程序">
+<meta name="twitter:image" content="http://yoursite.com/img/vpn/1.png">
 
 
 
@@ -125,13 +129,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/02/28/自己搭梯子/"/>
 
 
 
 
 
-  <title> 设计模式----单一职责原则 | MaWenge's Blog </title>
+  <title> 自己搭梯子 | MaWenge's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -244,7 +248,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/03/设计模式-单一职责原则/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/28/自己搭梯子/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Turbo">
@@ -268,7 +272,7 @@
             
             
               
-                设计模式----单一职责原则
+                自己搭梯子
               
             
           </h1>
@@ -283,8 +287,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-03T21:51:54+08:00">
-                2017-02-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-28T15:55:09+08:00">
+                2018-02-28
               </time>
             
 
@@ -302,8 +306,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/02/03/设计模式-单一职责原则/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/03/设计模式-单一职责原则/" itemprop="commentCount"></span>
+                <a href="/2018/02/28/自己搭梯子/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/02/28/自己搭梯子/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -329,33 +333,10 @@
       
 
       
-        <h2 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h2><p>面向对象的编程有很多的设计模式，例如单例模式，观察者模式，装饰者模式等等，这些模式适用于不同的场景，但是这些设计模式又遵循几个相同的原则，可以说这些原则是所有设计模式的基础</p>
-<ol>
-<li><strong>单一职责原则</strong></li>
-<li><strong>里氏替换原则</strong></li>
-<li><strong>依赖倒置原则</strong></li>
-<li><strong>接口隔离原则</strong></li>
-<li><strong>迪米特法则</strong></li>
-<li><strong>开闭原则</strong></li>
-</ol>
-<p>如果能够很好地理解这些原则，对以后学习具体的设计模式将会有很大的帮助，所以这里我也结合所看的书籍并结合自己的理解深入剖析每种原则的含义。如果发现有不准确的地方，欢迎留言交流，共同进步。</p>
-<h2 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h2><p>单一职责的英文名称是<strong>Single Responsibility Principle</strong>，简称SRP。SRP原话解释如下：</p>
-<blockquote>
-<p>There should never be more than one reason for a class to change<br>应该有且只有一个原因引起类的变更</p>
-</blockquote>
-<p>其实单一职责这句话本身就已经说得很清楚了，就是一个类只负责一件事，不负责其他的事情。而能够引起这个类变化的原因也是只有这个类负责的事情。</p>
-<p>这里举一个例子，也是书上的例子：<br>打电话需要四个过程，拨号、通话、回应、挂机，现在写一个接口如下<br><img src="/img/1.png" alt=""></p>
-<p>这三个方法都是电话的功能，把他们全都放在IPhone的接口中也是非常合理的。而且它就负责一件事，电话的事情，但只有一个原因引起变化吗？好像不是<br>IPhone这个接口其实有两个职责：一是协议管理，二是数据传送。dial() hangup()实现的是协议管理，分别负责拨号接通和挂机；chat()实现的是数据的传送，把模拟信号转换成数字信号等等。协议的变化和数据传送的变化都能够引起接口或实现类的变化。那么协议控制和数据传送之间相互依赖吗？电话拨号，我们只要接通就成，甭管是电信还是网通的协议；电话接通后我们也不关心传递的是什么数据。通过这样的分析我们发现类图上的IPhone接口包含了两个职责，而且这两个职责的变化不会相互影响，那就考虑拆分成两个接口<br><img src="/img/2.png" alt=""></p>
-<p>那么这么做到底能有什么好处呢，请看下面：</p>
-<ol>
-<li><p>我们使用的是面向接口的编程，所以暴露给使用者的是两个接口类型IConnectionManager和IDataTransfer。使用者只能调用接口中声明的方法。面向接口编程实现了方法的隔离，使得使用者只需要使用方法即可，不需要知道具体实现，并且只能使用该接口的方法。所以在业务层面与协议有关的就是IConnectionManager，而与数据传输相关的就是IDataTransfer，到时候如果修改了接口里面的内容，业务调用层需要修改的内容范围也会减小（例如如果修改了数据传输IDataTransfer，那么业务层只需要修改IDataTransfer有关的内容，IConnectionManager相关的内容则完全不用修改，找起来也方便一点，如果没有拆分成两个接口，那么就要找到所有IPhone接口使用的地方一一检查）</p>
-</li>
-<li><p>这里的实现类Phone仍然实现了打电话有关的所有功能，只不过对于不同的使用情况通过接口类型暴露不同的方法给调用者。那么有人肯定要问为什么不定义两个实现类分别实现IConnectionManager和IDataManager，然后分别把两个实现类的对象传递给接口对象。这里IConnectionManager和IDataManager的实现方法如果要共享数据的话，那么让Phone类同时实现IConnectionManager和IDataManager接口，这样就可以很方便的在类内部维护共享数据以及状态，而通过接口对外暴露功能方法，类的结构也很清晰。还有一种就是Phone类组合IConnectionManager和IDataManager的实现类，但是组合是一种强耦合关系，而且还增加了类的复杂性，多了两个类，还不如直接让Phone类实现IConnectionManager和IDataManager接口。</p>
-</li>
-</ol>
-<p>单一职责原则提出了一个编写程序的标准，用“职责”或“变化原因”来衡量接口或类设计得是否优良，但是“职责”和“变化原因”都是不可度量的，因项目而异，因环境而异。</p>
-<p>上面的例子从功能上来说，定义一个IPhone接口来说也是没有错的，实现了电话的功能，而且设计还很简单，仅仅定义一个接口和一个实现类。但是确实是有两个可以变化的原因放到了一个接口里面，这就为以后的变化带来了风险。如果以后模拟电话升级到数字电话，我们提供的接口IPhone是不是要修改了？接口修改对其他的Invoker类是不是有很大的影响？</p>
-<p>单一职责适用于接口、类，同时也适用于方法。一个方法尽量做一件事。我相信大多数人编程的时候突然发现接下来要写的一段代码以前好像写过，然后回去把那段代码又提取出来变成一个单独的方法。这就时前面设计方法的时候做了太多事情，粒度太大了，相信大多数人多方法的单一职责还是比较容易理解的。</p>
+        <p>给大家介绍一个简单的翻墙的方法</p>
+<h4 id="现状"><a href="#现状" class="headerlink" title="现状"></a>现状</h4><p>由于为了网络安全，大量提供VPN服务的公司被关掉，以前那种虽然网速不快的付费翻墙服务也没法用了。以前同事还在自己的服务器上搭建了一个VPN服务，但是接连收到阿里云的消息，吓得赶紧关掉。顶多使用一些镜像Google来查询问题，但是也会出现不能用的时候，十分不方便。</p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><p>条件：一台服务器 +  xshell + chrome + SwitchySharp扩展程序。<br><strong>1</strong> 首先使用xshell通过ssh连接到远程服务器上。<br><img src="/img/vpn/1.png" alt=""><br><strong>2</strong>连接成功之后打开隧道窗格显示（查看-&gt; 隧道窗格），此时xshell底部会出现如下窗格<br><img src="/img/vpn/2.png" alt=""><br><strong>3</strong> 选中转移规则，在下面的空白处右键添加，类型选择Dynamic(SOCKS4/5)，侦听端口自定义，默认1080。创建成功之后底部就会显示。<br><img src="/img/vpn/3.png" alt=""><br><img src="/img/vpn/4.png" alt=""><br>这样xshell中配置完成，相当只要本机把数据发生到刚才指定的端口，数据就会传输到我们的远程服务器上。<br><strong>4</strong>在Chrome中添加SwitchySharp插件。<br><strong>5</strong>在SwitchySharp中添加一个情景模式<br><img src="/img/vpn/5.png" alt=""><br><strong>6</strong>大功告成。每次想要爬梯子的时候只要打开xshell连接到远程服务器（保证隧道连接建立），然后再SwitchySharp选中对应模式即可。<br><img src="/img/vpn/6.png" alt=""></p>
+<h4 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h4><p>希望大家好好利用工具，为社会主义建设作出贡献！</p>
 
       
     </div>
@@ -382,8 +363,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/01/07/android-ptp-编程（1）/" rel="next" title="android ptp 编程（1）">
-                <i class="fa fa-chevron-left"></i> android ptp 编程（1）
+              <a href="/2018/02/28/一次线上内存泄漏排查/" rel="next" title="一次线上内存泄漏排查">
+                <i class="fa fa-chevron-left"></i> 一次线上内存泄漏排查
               </a>
             
           </div>
@@ -391,10 +372,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/10/29/新建文章标题/" rel="prev" title="新建文章标题">
-                新建文章标题 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -524,7 +501,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计原则"><span class="nav-number">1.</span> <span class="nav-text">设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单一职责原则"><span class="nav-number">2.</span> <span class="nav-text">单一职责原则</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#现状"><span class="nav-number">1.</span> <span class="nav-text">现状</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最后"><span class="nav-number">3.</span> <span class="nav-text">最后</span></a></li></ol></div>
             
 
           </div>
